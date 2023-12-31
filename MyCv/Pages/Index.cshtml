@@ -1,0 +1,50 @@
+﻿@page "{slug?}"
+@using MyCv
+@model IndexModel
+@{
+    ViewData["Title"] = $"Lebenslauf von {Model.Personal.Name}";
+}
+<div class="start">
+    <h1>Über mich!</h1>
+    <div class="name">@Model.Personal.Name</div>
+    <img asp-append-version="true" src="data/@Model.Personal.Image.Path" width="@Model.Personal.Image.Width" alt="@Model.Personal.Image.AlternativeText"/>
+    @if (!Model.ModelState.IsValid)
+    {
+        <div class="error">
+            Download Token ungültig!
+        </div>
+    }
+    <label for="downloadExpander" class="expander">
+        <input id="downloadExpander" type="checkbox" />
+        <span>Lebenslauf Download</span>
+        <form method="post">
+            Username:
+            <input asp-for="Login.User"/>
+            Token:
+            <input asp-for="Login.Token" type="password"/>
+            <input type="submit" value="Download"/>
+            <span class="info">Für Zugangsdaten eine E-Mail an: @Utils.MailProtection($"<a href=\"mailto:{Model.Personal.EMail}\">mail</a>").</span>
+        </form>
+
+    </label>
+</div>
+<h2>Timeline</h2>
+@foreach (var entry in Model.WebCv.Entries)
+{
+    <article>
+        <div class="time">@entry.TimePeriod</div>
+        <div class="short">@entry.ShortTitle</div>
+        <div class="additional">@entry.Additional</div>
+        <div class="text">
+            @Html.Raw(Markdig.Markdown.ToHtml(entry.Text))
+        </div>
+    </article>
+}
+
+<h2>Fähigkeiten</h2>
+<ul class="facts">
+    @foreach (var fact in Model.WebCv.KeyFacts)
+    {
+        <li>@fact.Text</li>
+    }
+</ul>

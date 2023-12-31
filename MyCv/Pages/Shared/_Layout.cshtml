@@ -1,0 +1,53 @@
+﻿@using MyCv
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@inject SideStructure SideStructure
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - MyCv</title>
+    <link rel="icon" type="image/x-icon" href="/data/favicon.ico"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li>
+                <a href="/">
+                    <img src="/data/Icon.png" alt="Homepage Icon"/>
+                    <span>Home</span>
+                </a>
+            </li>
+        </ul>
+
+    </nav>
+    <div class="switch">
+        <input id="themeToggle" class="switch_input" name="switch" type="checkbox" onclick="setTheme(this.checked)">
+        <label class="switch_label material-symbols-outlined" for="themeToggle"></label>
+    </div>
+</header>
+
+<main>
+    @RenderBody()
+</main>
+
+<footer>
+    <nav>
+        <ul>
+            @foreach (var side in SideStructure.Sides.Where(i => !i.InMainNav))
+            {
+                <li>
+                    <a href="/@side.UrlSlug()">@side.Title</a>
+                </li>
+            }
+        </ul>
+    </nav>
+    <div><span class="material-symbols-outlined">copyright</span> @SideStructure.PersonalInformation.Name 2023 - MyCv</div>
+    <div>Made with <span class="material-symbols-outlined">favorite</span> and C#</div>
+</footer>
+<script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>

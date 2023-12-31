@@ -1,0 +1,34 @@
+﻿@using Markdig
+@using MyCv
+@{
+    OtherSide side = (OtherSide)(ViewData["SideData"] ?? default(OtherSide));
+    ViewData["Title"] = side.Title;
+}
+
+<h1>@side.Title</h1>
+@foreach (var sideSection in side.Sections)
+{
+    <h2>@sideSection.Title</h2>
+    @if (!string.IsNullOrWhiteSpace(sideSection.Text))
+    {
+        @Html.Raw(Utils.MailProtection(Markdown.ToHtml(sideSection.Text)))
+    }
+
+    @foreach (var subSide in sideSection.SubEntry ?? Array.Empty<OtherSideSection>())
+    {
+        <h3>@subSide.Title</h3>
+        @if (!string.IsNullOrWhiteSpace(subSide.Text))
+        {
+            @Html.Raw(Utils.MailProtection(Markdown.ToHtml(subSide.Text)))
+        }
+        @foreach (var subSubSide in subSide.SubEntry ?? Array.Empty<OtherSideSection>())
+        {
+            <h4>@subSubSide.Title</h4>
+            @if (!string.IsNullOrWhiteSpace(subSubSide.Text))
+            {
+                @Html.Raw(Utils.MailProtection(Markdown.ToHtml(subSubSide.Text)))
+            }
+        
+        }
+    }
+}
