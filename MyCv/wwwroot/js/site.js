@@ -1,4 +1,4 @@
-﻿const storage = window.localStorage;
+﻿const storage = window.sessionStorage;
 
 var savedDarkTheme = storage.getItem("darkTheme");
 
