@@ -94,7 +94,7 @@ public class IndexModel(
         myCvContext.Update(usedToken);
         await myCvContext.SaveChangesAsync();
 
-        var file = await memoryCache.GetOrCreateAsync("cv", async entry =>
+        var file = await memoryCache.GetOrCreateAsync("cv", async _ =>
         {
             using var memoryStream = new MemoryStream();
             await Task.Run(() => exporter.Create(sideStructure, memoryStream));
@@ -108,10 +108,7 @@ public class IndexModel(
 
     private string CreateToken()
     {
-        List<Claim> claims = new()
-        {
-            new Claim(ClaimTypes.Role, "Admin")
-        };
+        List<Claim> claims = [new Claim(ClaimTypes.Role, "Admin")];
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
             applicationSecretProvider.ApplicationSecret));
