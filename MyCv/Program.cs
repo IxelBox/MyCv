@@ -8,7 +8,7 @@ using YamlDotNet.Serialization;
 var preBuilder = WebApplication.CreateBuilder(args);
 var preBuild = preBuilder.Build();
 var webHostEnvironment = preBuild.Services.GetService<IWebHostEnvironment>() ?? throw new NullReferenceException("Web Host Environment can't initialize!");
-var myCvYaml =Path.Combine(webHostEnvironment.WebRootPath, "data", "mycv", "mycv.yaml");
+var myCvYaml =Path.Combine(webHostEnvironment.WebRootPath, "data", "mycv.yaml");
 await preBuild.DisposeAsync();
 
 var deserializer = new DeserializerBuilder().Build();
@@ -21,6 +21,10 @@ builder.Services.AddSingleton<IWorkingDirectoryProvider, PdfWorkingDirectoryProv
 builder.Services.AddSingleton<IFileExporter, PdfExporter>();
 builder.Services.AddSingleton<ApplicationSecretProvider>();
 builder.Services.AddSingleton<RequestBlocker>();
+builder.Services.AddOutputCache(builder2 =>
+{
+    builder2.DefaultExpirationTimeSpan = TimeSpan.FromDays(100);
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -32,8 +36,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
 }
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -42,12 +44,10 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
                        ForwardedHeaders.XForwardedProto
 });
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
-app.UseAuthorization();
+app.UseOutputCache();
 
 app.MapRazorPages();
 

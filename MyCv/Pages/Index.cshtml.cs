@@ -5,7 +5,9 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using MyCv;
 using MyCv.Database;
@@ -15,50 +17,48 @@ using YamlDotNet.Core.Tokens;
 
 namespace mycv.Pages;
 
+[OutputCache(VaryByRouteValueNames = ["slug"])]
 public class IndexModel(
     SideStructure sideStructure,
     IFileExporter exporter,
     MyCvContext myCvContext,
     IConfiguration configuration,
     ApplicationSecretProvider applicationSecretProvider,
-    RequestBlocker requestBlocker) : PageModel
+    RequestBlocker requestBlocker,
+    IMemoryCache memoryCache) : PageModel
 {
     public PersonalInformation Personal => sideStructure.PersonalInformation;
     public MyWebCv WebCv => sideStructure.MyWebCv;
-    
+
     public async Task<IActionResult> OnGet(string? slug)
     {
         await myCvContext.Database.EnsureCreatedAsync();
-        
+
         if (!string.IsNullOrWhiteSpace(slug))
         {
             var side = sideStructure.Sides.FirstOrDefault(s => s.UrlSlug() == slug.ToLower());
             if (side == default)
             {
-                return new ViewResult(){ViewName = "NotFound"};
+                return new ViewResult() { ViewName = "NotFound" };
             }
 
             ViewData["SideData"] = side;
-            return new ViewResult(){ViewName = "OtherSide", ViewData = this.ViewData};
-
+            return new ViewResult() { ViewName = "OtherSide", ViewData = this.ViewData };
         }
 
         return this.Page();
     }
 
-    [BindProperty]
-    public UserToken Login {
-        get;
-        set;
-    }
-    
+    [BindProperty] public UserToken Login { get; set; }
+
+    [OutputCache(NoStore = true)]
     public async Task<IActionResult> OnPost()
     {
         if (requestBlocker.BlockRequest(Request))
         {
             return this.BadRequest();
         }
-        
+
         if (!ModelState.IsValid)
         {
             return Page();
@@ -81,7 +81,8 @@ public class IndexModel(
             }
         }
 
-        var usedToken = await myCvContext.Tokens.FirstOrDefaultAsync(t => t.User == Login.User && t.Token == Login.Token);
+        var usedToken =
+            await myCvContext.Tokens.FirstOrDefaultAsync(t => t.User == Login.User && t.Token == Login.Token);
 
         if (usedToken == null)
         {
@@ -100,24 +101,30 @@ public class IndexModel(
             ModelState.AddModelError("Login.User", "Token to old");
             return Page();
         }
-        
+
         usedToken.UsageCount += 1;
         myCvContext.Update(usedToken);
         await myCvContext.SaveChangesAsync();
-        
-        var memoryStream = new MemoryStream();
-        await Task.Run(() => exporter.Create(sideStructure, memoryStream));
 
-        return File(memoryStream, "application/pdf", $"Lebenslauf_{sideStructure.PersonalInformation.Name}.pdf");
+        var file = await memoryCache.GetOrCreateAsync("cv", async (entry) =>
+        {
+            using var memoryStream = new MemoryStream();
+            await Task.Run(() => exporter.Create(sideStructure, memoryStream));
+            memoryStream.Seek(0, 0);
+            var file = memoryStream.ToArray();
+            return file;
+        });
+
+        return File(file!, "application/pdf", $"Lebenslauf_{sideStructure.PersonalInformation.Name}.pdf");
     }
-    
+
     private string CreateToken()
     {
         List<Claim> claims = new()
         {
-            new Claim(ClaimTypes.Role,"Admin"),
+            new Claim(ClaimTypes.Role, "Admin"),
         };
- 
+
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
             applicationSecretProvider.ApplicationSecret));
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -126,11 +133,11 @@ public class IndexModel(
             expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: cred
         );
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token) ?? throw new NullReferenceException("token can't be write!");
-        
+        var jwt = new JwtSecurityTokenHandler().WriteToken(token) ??
+                  throw new NullReferenceException("token can't be write!");
+
         return jwt;
     }
-    
-    public record UserToken([MaxLength(25)] string User, [MaxLength(25)] string Token);
 
+    public record UserToken([MaxLength(25)] string User, [MaxLength(25)] string Token);
 }
