@@ -12,17 +12,17 @@
 <form method="post" asp-page-handler="add">
     <input type="hidden" asp-for="Jwt"/>
     User
-    <input asp-for="DownloadToken.User"/>
+    <input asp-for="DownloadToken!.User"/>
     Token
-    <input asp-for="DownloadToken.Token"/>
+    <input asp-for="DownloadToken!.Token"/>
     Description
-    <input asp-for="DownloadToken.Description"/>
+    <input asp-for="DownloadToken!.Description"/>
     <input type="submit" value="Neuer Token"/>
 </form>
 
 All Tokens:
 <ul>
-    @foreach (var token in Model.Tokens)
+    @foreach (var token in Model.Tokens ?? Array.Empty<DownloadToken>())
     {
         <li>@token.User | @token.UsageCount | IsExpired? @token.IsExpired()</li>
     }

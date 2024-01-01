@@ -20,9 +20,9 @@
         <span>Lebenslauf Download</span>
         <form method="post">
             Username:
-            <input asp-for="Login.User"/>
+            <input asp-for="Login!.User"/>
             Token:
-            <input asp-for="Login.Token" type="password"/>
+            <input asp-for="Login!.Token" type="password"/>
             <input type="submit" value="Download"/>
             <span class="info">Für Zugangsdaten eine E-Mail an: @Utils.MailProtection($"<a href=\"mailto:{Model.Personal.EMail}\">mail</a>").</span>
         </form>

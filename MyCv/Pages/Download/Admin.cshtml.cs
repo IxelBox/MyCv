@@ -17,9 +17,9 @@ public class Admin(
 {
     [BindProperty(SupportsGet = true)] public string? Jwt { get; set; }
 
-    [BindProperty] public UserToken DownloadToken { get; set; }
+    [BindProperty] public UserToken? DownloadToken { get; set; }
 
-    public DownloadToken[] Tokens { get; set; }
+    public DownloadToken[]? Tokens { get; set; }
 
     public async Task<IActionResult> OnGet()
     {
@@ -40,7 +40,7 @@ public class Admin(
     {
         if (requestBlocker.BlockRequest(Request)) return BadRequest();
 
-        if (!ModelState.IsValid) return BadRequest();
+        if (!ModelState.IsValid || DownloadToken == null) return BadRequest();
 
         if (string.IsNullOrEmpty(Jwt) || !ValidateJwt()) return BadRequest();
         requestBlocker.RemoveBlockCount(Request);
@@ -66,7 +66,7 @@ public class Admin(
         {
             new JwtSecurityTokenHandler().ValidateToken(Jwt, GetValidationParameters(), out var _);
         }
-        catch (Exception _)
+        catch (Exception)
         {
             return false;
         }

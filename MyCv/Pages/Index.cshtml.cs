@@ -27,7 +27,7 @@ public class IndexModel(
     public PersonalInformation Personal => sideStructure.PersonalInformation;
     public MyWebCv WebCv => sideStructure.MyWebCv;
 
-    [BindProperty] public UserToken Login { get; set; }
+    [BindProperty] public UserToken? Login { get; set; }
 
     public async Task<IActionResult> OnGet(string? slug)
     {
@@ -50,7 +50,7 @@ public class IndexModel(
     {
         if (requestBlocker.BlockRequest(Request)) return BadRequest();
 
-        if (!ModelState.IsValid) return Page();
+        if (!ModelState.IsValid || Login == null) return Page();
 
         var adminSection = configuration.GetSection("Admin");
         if (adminSection.Exists())
@@ -70,7 +70,7 @@ public class IndexModel(
         }
 
         var usedToken =
-            await myCvContext.Tokens.FirstOrDefaultAsync(t => t.User == Login.User && t.Token == Login.Token);
+            await myCvContext.Tokens.FirstOrDefaultAsync(t => t.User == Login!.User && t.Token == Login!.Token);
 
         if (usedToken == null)
         {
