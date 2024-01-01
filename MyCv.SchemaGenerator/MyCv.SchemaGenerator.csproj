@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="NJsonSchema.Yaml" Version="10.9.0" />
+        <PackageReference Include="NJsonSchema.Yaml" Version="10.9.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MyCv.Model\MyCv.Model.csproj" />
+        <ProjectReference Include="..\MyCv.Model\MyCv.Model.csproj"/>
     </ItemGroup>
 
 </Project>

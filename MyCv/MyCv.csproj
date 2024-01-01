@@ -1,29 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Content Remove="Pages\Shared\_ValidationScriptsPartial.cshtml" />
-  </ItemGroup>
+    <ItemGroup>
+        <Content Remove="Pages\Shared\_ValidationScriptsPartial.cshtml"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Markdig.Signed" Version="0.34.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
-    <PackageReference Include="YamlDotNet" Version="13.7.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Markdig.Signed" Version="0.34.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3"/>
+        <PackageReference Include="YamlDotNet" Version="13.7.1"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MyCv.Export.Pdf\MyCv.Export.Pdf.csproj" />
-    <ProjectReference Include="..\MyCv.Model\MyCv.Model.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\MyCv.Export.Pdf\MyCv.Export.Pdf.csproj"/>
+        <ProjectReference Include="..\MyCv.Model\MyCv.Model.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\data\" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="wwwroot\data\"/>
+    </ItemGroup>
 
 </Project>

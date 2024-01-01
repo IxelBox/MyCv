@@ -15,7 +15,7 @@
     font-family: 'Material Symbols Outlined';
     font-style: normal;
     font-weight: 400;
-    
+
     src: url("fonts/material-symbols.woff2") format('woff2');
 }
 
@@ -126,7 +126,7 @@ body {
 
 h1 {
     font-family: "Heading 700";
-  
+
     font-size: 3rem;
 }
 
@@ -268,7 +268,7 @@ main {
     flex-direction: column;
 }
 
-.error{
+.error {
     margin-top: 10pt;
     color: red;
     font-size: 1.2rem;
@@ -324,11 +324,11 @@ main {
     opacity: 1;
 }
 
-.expander input{
+.expander input {
     width: 180pt;
 }
 
-input[type='submit']{
+input[type='submit'] {
     align-self: center;
     width: 75pt;
     margin-top: 5pt;

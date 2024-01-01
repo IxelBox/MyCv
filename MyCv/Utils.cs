@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace MyCv;
 
@@ -22,10 +21,6 @@ internal partial class Utils
         //First to lower case
         value = value.ToLowerInvariant();
 
-        //Remove all accents
-        // var bytes = Encoding.GetEncoding("Cyrillic").GetBytes(value);
-        //  value = Encoding.ASCII.GetString(bytes);
-
         //Replace spaces
         value = WhiteSpaceRegex().Replace(value, "-");
 
@@ -41,13 +36,16 @@ internal partial class Utils
         return value;
     }
 
-    public static string MailProtection(string html) =>
-        MailToRegex().Replace(html, @"$1_AT_$2_DOT_$3");
-    
+    public static string MailProtection(string html)
+    {
+        return MailToRegex().Replace(html, @"$1_AT_$2_DOT_$3");
+    }
 }
 
 public static class Extensions
 {
     public static string UrlSlug(this OtherSide otherSide)
-        => Utils.ToUrlSlug(otherSide.Title);
+    {
+        return Utils.ToUrlSlug(otherSide.Title);
+    }
 }

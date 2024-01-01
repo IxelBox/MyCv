@@ -1,8 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using Microsoft.AspNetCore.Http.HttpResults;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.OutputCaching;
@@ -12,8 +11,6 @@ using Microsoft.IdentityModel.Tokens;
 using MyCv;
 using MyCv.Database;
 using MyCv.Model.Providers;
-using mycv.Pages.Download;
-using YamlDotNet.Core.Tokens;
 
 namespace mycv.Pages;
 
@@ -30,6 +27,8 @@ public class IndexModel(
     public PersonalInformation Personal => sideStructure.PersonalInformation;
     public MyWebCv WebCv => sideStructure.MyWebCv;
 
+    [BindProperty] public UserToken Login { get; set; }
+
     public async Task<IActionResult> OnGet(string? slug)
     {
         await myCvContext.Database.EnsureCreatedAsync();
@@ -37,32 +36,21 @@ public class IndexModel(
         if (!string.IsNullOrWhiteSpace(slug))
         {
             var side = sideStructure.Sides.FirstOrDefault(s => s.UrlSlug() == slug.ToLower());
-            if (side == default)
-            {
-                return new ViewResult() { ViewName = "NotFound" };
-            }
+            if (side == default) return new ViewResult { ViewName = "NotFound" };
 
             ViewData["SideData"] = side;
-            return new ViewResult() { ViewName = "OtherSide", ViewData = this.ViewData };
+            return new ViewResult { ViewName = "OtherSide", ViewData = ViewData };
         }
 
-        return this.Page();
+        return Page();
     }
-
-    [BindProperty] public UserToken Login { get; set; }
 
     [OutputCache(NoStore = true)]
     public async Task<IActionResult> OnPost()
     {
-        if (requestBlocker.BlockRequest(Request))
-        {
-            return this.BadRequest();
-        }
+        if (requestBlocker.BlockRequest(Request)) return BadRequest();
 
-        if (!ModelState.IsValid)
-        {
-            return Page();
-        }
+        if (!ModelState.IsValid) return Page();
 
         var adminSection = configuration.GetSection("Admin");
         if (adminSection.Exists())
@@ -106,7 +94,7 @@ public class IndexModel(
         myCvContext.Update(usedToken);
         await myCvContext.SaveChangesAsync();
 
-        var file = await memoryCache.GetOrCreateAsync("cv", async (entry) =>
+        var file = await memoryCache.GetOrCreateAsync("cv", async entry =>
         {
             using var memoryStream = new MemoryStream();
             await Task.Run(() => exporter.Create(sideStructure, memoryStream));
@@ -122,10 +110,10 @@ public class IndexModel(
     {
         List<Claim> claims = new()
         {
-            new Claim(ClaimTypes.Role, "Admin"),
+            new Claim(ClaimTypes.Role, "Admin")
         };
 
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
             applicationSecretProvider.ApplicationSecret));
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
         var token = new JwtSecurityToken(

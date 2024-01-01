@@ -1,7 +1,7 @@
-﻿@using Markdig
-@using MyCv
+﻿@using MyCv
+@using Markdig
 @{
-    OtherSide side = (OtherSide)(ViewData["SideData"] ?? default(OtherSide));
+    var side = (OtherSide)(ViewData["SideData"] ?? default(OtherSide));
     ViewData["Title"] = side.Title;
 }
 
@@ -21,6 +21,7 @@
         {
             @Html.Raw(Utils.MailProtection(Markdown.ToHtml(subSide.Text)))
         }
+
         @foreach (var subSubSide in subSide.SubEntry ?? Array.Empty<OtherSideSection>())
         {
             <h4>@subSubSide.Title</h4>
@@ -28,7 +29,6 @@
             {
                 @Html.Raw(Utils.MailProtection(Markdown.ToHtml(subSubSide.Text)))
             }
-        
         }
     }
 }

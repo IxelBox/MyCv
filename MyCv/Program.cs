@@ -7,8 +7,9 @@ using YamlDotNet.Serialization;
 
 var preBuilder = WebApplication.CreateBuilder(args);
 var preBuild = preBuilder.Build();
-var webHostEnvironment = preBuild.Services.GetService<IWebHostEnvironment>() ?? throw new NullReferenceException("Web Host Environment can't initialize!");
-var myCvYaml =Path.Combine(webHostEnvironment.WebRootPath, "data", "mycv.yaml");
+var webHostEnvironment = preBuild.Services.GetService<IWebHostEnvironment>() ??
+                         throw new NullReferenceException("Web Host Environment can't initialize!");
+var myCvYaml = Path.Combine(webHostEnvironment.WebRootPath, "data", "mycv.yaml");
 await preBuild.DisposeAsync();
 
 var deserializer = new DeserializerBuilder().Build();
@@ -21,10 +22,7 @@ builder.Services.AddSingleton<IWorkingDirectoryProvider, PdfWorkingDirectoryProv
 builder.Services.AddSingleton<IFileExporter, PdfExporter>();
 builder.Services.AddSingleton<ApplicationSecretProvider>();
 builder.Services.AddSingleton<RequestBlocker>();
-builder.Services.AddOutputCache(builder2 =>
-{
-    builder2.DefaultExpirationTimeSpan = TimeSpan.FromDays(100);
-});
+builder.Services.AddOutputCache(builder2 => { builder2.DefaultExpirationTimeSpan = TimeSpan.FromDays(100); });
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -33,10 +31,7 @@ builder.Services.AddSingleton(typeof(SideStructure), data);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-}
+if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Error");
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {

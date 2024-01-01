@@ -1,5 +1,4 @@
-﻿
-using MyCv.Model;
+﻿using MyCv.Model;
 using NJsonSchema;
 
 Console.WriteLine("The Schema from MyCv:");

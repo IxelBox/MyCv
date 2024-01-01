@@ -7,17 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MyCv.Model\MyCv.Model.csproj" />
+        <ProjectReference Include="..\MyCv.Model\MyCv.Model.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="PDFsharp-MigraDoc" Version="6.0.0" />
+        <PackageReference Include="PDFsharp-MigraDoc" Version="6.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.Extensions.FileProviders.Abstractions">
-        <HintPath>..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.0\Microsoft.Extensions.FileProviders.Abstractions.dll</HintPath>
-      </Reference>
+        <Reference Include="Microsoft.Extensions.FileProviders.Abstractions">
+            <HintPath>..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.0\Microsoft.Extensions.FileProviders.Abstractions.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

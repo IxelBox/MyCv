@@ -1,9 +1,8 @@
 ﻿@page
-@using YamlDotNet.Core.Tokens
 @using MyCv.Database
-@model mycv.Pages.Download.Admin
+@model Admin
 
-@if(!ModelState.IsValid)
+@if (!ModelState.IsValid)
 {
     <div class="error">
         Token Daten Invalid!
@@ -11,7 +10,7 @@
 }
 
 <form method="post" asp-page-handler="add">
-    <input type="hidden" asp-for="Jwt" />
+    <input type="hidden" asp-for="Jwt"/>
     User
     <input asp-for="DownloadToken.User"/>
     Token

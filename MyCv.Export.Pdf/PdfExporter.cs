@@ -1,13 +1,10 @@
-﻿using Microsoft.Extensions.FileProviders;
-using MigraDoc.DocumentObjectModel;
-using MigraDoc.DocumentObjectModel.Visitors;
+﻿using MigraDoc.DocumentObjectModel;
 using MigraDoc.Rendering;
 using MyCv.Model;
 using MyCv.Model.Providers;
+using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Fonts;
-using PdfSharp.Pdf;
-using PdfSharp.Snippets.Drawing;
 using PdfSharp.Snippets.Font;
 
 namespace MyCv.Export.Pdf;
@@ -16,13 +13,13 @@ internal static class Constants
 {
     internal static class Styles
     {
-        public const string Normal = nameof(Constants.Styles.Normal);
-        public const string Italic = nameof(Constants.Styles.Italic);
-        public const string Bold = nameof(Constants.Styles.Bold);
-        public const string Heading1 = nameof(Constants.Styles.Heading1);
-        public const string Heading2 = nameof(Constants.Styles.Heading2);
-        public const string Heading3 = nameof(Constants.Styles.Heading3);
-        public const string BulletList = nameof(Constants.Styles.BulletList);
+        public const string Normal = nameof(Normal);
+        public const string Italic = nameof(Italic);
+        public const string Bold = nameof(Bold);
+        public const string Heading1 = nameof(Heading1);
+        public const string Heading2 = nameof(Heading2);
+        public const string Heading3 = nameof(Heading3);
+        public const string BulletList = nameof(BulletList);
     }
 }
 
@@ -34,15 +31,15 @@ public class PdfExporter : IFileExporter
     {
         _folderProvider = workingDirectoryProvider;
         // NET6FIX
-        if (PdfSharp.Capabilities.Build.IsCoreBuild)
+        if (Capabilities.Build.IsCoreBuild)
             GlobalFontSettings.FontResolver = new FailsafeFontResolver();
     }
-    
+
     public Task Create(SideStructure data, Stream stream)
     {
         var document = PdfDocument(data);
 
-        var renderer = new PdfDocumentRenderer()
+        var renderer = new PdfDocumentRenderer
         {
             Document = document
         };
@@ -55,7 +52,7 @@ public class PdfExporter : IFileExporter
 
     private Document PdfDocument(SideStructure data)
     {
-        bool showBorder = false;
+        var showBorder = false;
         Document document = new()
         {
             Info =
@@ -81,17 +78,14 @@ public class PdfExporter : IFileExporter
         }
 
         AddSimpleTableAtEnd(
-            new("Name", data.PersonalInformation.Name),
-            new("Geburstag", data.PersonalInformation.Birthday),
-            new("Gebursort", data.PersonalInformation.Birthplace),
-            new("E-Mail", data.PersonalInformation.EMail),
-            new("Handy", data.PersonalInformation.Mobil),
-            new("Homepage", data.PersonalInformation.Homepage)
+            new KeyValuePair<string, string>("Name", data.PersonalInformation.Name),
+            new KeyValuePair<string, string>("Geburstag", data.PersonalInformation.Birthday),
+            new KeyValuePair<string, string>("Gebursort", data.PersonalInformation.Birthplace),
+            new KeyValuePair<string, string>("E-Mail", data.PersonalInformation.EMail),
+            new KeyValuePair<string, string>("Handy", data.PersonalInformation.Mobil),
+            new KeyValuePair<string, string>("Homepage", data.PersonalInformation.Homepage)
         );
-        foreach (var section in data.MyPrintCv.Sections)
-        {
-            AddSection(section, 1);
-        }
+        foreach (var section in data.MyPrintCv.Sections) AddSection(section, 1);
 
         return document;
 
@@ -103,20 +97,12 @@ public class PdfExporter : IFileExporter
                 para.AddBookmark(section.Title);
             }
 
-            if (section.Entries?.Any() ?? false)
-            {
-                AddEntries(section.Entries);
-            }
+            if (section.Entries?.Any() ?? false) AddEntries(section.Entries);
 
-            if (section.Skills?.Any() ?? false)
-            {
-                AddSkills(section.Skills);
-            }
+            if (section.Skills?.Any() ?? false) AddSkills(section.Skills);
 
             foreach (var subSection in section.SubSections ?? Array.Empty<CvSection>())
-            {
                 AddSection(subSection, level + 1);
-            }
 
             void AddEntries(CvEntry[] entries)
             {
@@ -129,9 +115,7 @@ public class PdfExporter : IFileExporter
             void AddSkills(CvSkill[] skills)
             {
                 foreach (var skill in skills)
-                {
                     document.LastSection.AddParagraph(skill.Text, Constants.Styles.BulletList);
-                }
 
                 document.LastSection.AddParagraph();
             }
@@ -165,9 +149,7 @@ public class PdfExporter : IFileExporter
                 row.Cells[0].AddParagraph(item.Key);
                 var paragraph = row.Cells[1].AddParagraph();
                 if (!string.IsNullOrWhiteSpace(item.Value.start))
-                {
                     paragraph.AddFormattedText($"{item.Value.start}, ", Constants.Styles.Bold);
-                }
 
                 if (!string.IsNullOrWhiteSpace(item.Value.addtional))
                     paragraph.AddFormattedText($"{item.Value.addtional}", Constants.Styles.Italic).AddLineBreak();
@@ -178,7 +160,7 @@ public class PdfExporter : IFileExporter
 
             Unit GetMaxTextLength(string[] text)
             {
-                var renderer = new PdfDocumentRenderer()
+                var renderer = new PdfDocumentRenderer
                 {
                     Document = new Document()
                 };

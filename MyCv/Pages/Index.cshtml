@@ -1,5 +1,6 @@
 ﻿@page "{slug?}"
 @using MyCv
+@using Markdig
 @model IndexModel
 @{
     ViewData["Title"] = $"Lebenslauf von {Model.Personal.Name}";
@@ -15,7 +16,7 @@
         </div>
     }
     <label for="downloadExpander" class="expander">
-        <input id="downloadExpander" type="checkbox" />
+        <input id="downloadExpander" type="checkbox"/>
         <span>Lebenslauf Download</span>
         <form method="post">
             Username:
@@ -36,7 +37,7 @@
         <div class="short">@entry.ShortTitle</div>
         <div class="additional">@entry.Additional</div>
         <div class="text">
-            @Html.Raw(Markdig.Markdown.ToHtml(entry.Text))
+            @Html.Raw(Markdown.ToHtml(entry.Text))
         </div>
     </article>
 }
