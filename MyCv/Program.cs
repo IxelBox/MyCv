@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.HttpOverrides;
 using MyCv;
 using MyCv.Database;
@@ -5,12 +6,7 @@ using MyCv.Export.Pdf;
 using MyCv.Model.Providers;
 using YamlDotNet.Serialization;
 
-var preBuilder = WebApplication.CreateBuilder(args);
-var preBuild = preBuilder.Build();
-var webHostEnvironment = preBuild.Services.GetService<IWebHostEnvironment>() ??
-                         throw new NullReferenceException("Web Host Environment can't initialize!");
-var myCvYaml = Path.Combine(webHostEnvironment.WebRootPath, "data", "mycv.yaml");
-await preBuild.DisposeAsync();
+var myCvYaml = Path.GetFullPath(Path.Combine("data","mycv.yaml"));
 
 var deserializer = new DeserializerBuilder().Build();
 var data = deserializer.Deserialize<SideStructure>(File.ReadAllText(myCvYaml));
@@ -39,7 +35,15 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
                        ForwardedHeaders.XForwardedProto
 });
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // Cache static files for 30 days
+        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=2592000");
+        ctx.Context.Response.Headers.Append("Expires", DateTime.UtcNow.AddDays(30).ToString("R", CultureInfo.InvariantCulture));
+    }
+});
 
 app.UseRouting();
 app.UseOutputCache();

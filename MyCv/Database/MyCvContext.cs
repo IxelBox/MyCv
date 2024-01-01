@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyCv.Database;
 
-public class MyCvContext(IWebHostEnvironment environment) : DbContext
+public class MyCvContext : DbContext
 {
     public DbSet<DownloadToken> Tokens { get; set; }
 
-    public string DbPath { get; } = Path.Join(environment.WebRootPath, "data", "MyCv.db");
+    public string DbPath { get; } = Path.Join("data", "MyCv.db");
 
     // The following configures EF to create a Sqlite database file in the
     // "data" folder for your web environment.
