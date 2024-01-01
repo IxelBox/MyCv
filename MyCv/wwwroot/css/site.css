@@ -328,14 +328,22 @@ main {
     width: 180pt;
 }
 
+input{
+    background: var(--background);
+    color: var(--text-color);
+    border: var(--text-color) dashed 1pt;
+    border-radius: 5pt;
+}
+
 input[type='submit'] {
     align-self: center;
     width: 75pt;
     margin-top: 5pt;
     font-family: "Heading 500";
     box-shadow: 2px 2px 5px var(--text-color);
-    border: var(--text-color) solid 1pt;
     background: var(--background);
+    border: var(--text-color) solid 1pt;
+    cursor: pointer;
     color: var(--text-color);
 }
 
