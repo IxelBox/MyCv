@@ -141,7 +141,7 @@ public class PdfExporter : IFileExporter
                 table.Borders.Visible = true;
             }
 
-            table.AddColumn(Unit.FromPoint(GetMaxTextLength(data.Select(d => d.Key).ToArray()) + 5));
+            table.AddColumn(GetMaxTextLength(data.Select(d => d.Key).ToArray()) + 5);
             table.AddColumn(width - table.Columns[0].Width);
             foreach (var item in data)
             {
@@ -167,7 +167,7 @@ public class PdfExporter : IFileExporter
                 renderer.RenderDocument();
                 var xGraphics = XGraphics.FromPdfPage(renderer.PdfDocument.AddPage(), XGraphicsPdfPageOptions.Prepend);
                 var font = document.Styles.Normal.Font;
-                var xfont = new XFont(font.Name, font.Size);
+                var xfont = new XFont(font.Name, font.Size.Point);
 
                 var max = text.Select(t => xGraphics.MeasureString(t, xfont).Width).Max();
 
